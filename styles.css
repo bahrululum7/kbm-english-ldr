@@ -1,76 +1,162 @@
 /* ========================= */
-/* STYLES.CSS */
+/*   GLOBAL BASE STYLE       */
 /* ========================= */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #f4f4f4;
 }
+
 header {
   background: #2f80ed;
   padding: 20px;
   color: white;
   text-align: center;
 }
+
+/* ========================= */
+/*   LAYOUT STRUCTURE        */
+/* ========================= */
 .container {
   display: flex;
-  height: calc(100vh - 80px);
+  gap: 20px;
+  padding: 20px;
 }
+
+/* SIDEBAR */
 .sidebar {
   width: 250px;
   background: white;
   padding: 20px;
   border-right: 2px solid #ccc;
+  border-radius: 10px;
+  height: fit-content;
 }
+
 .sidebar ul {
   list-style: none;
   padding: 0;
 }
+
 .sidebar li {
-  padding: 10px;
+  padding: 12px;
   background: #eee;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   cursor: pointer;
   border-radius: 6px;
+  transition: 0.2s;
 }
+
 .sidebar li:hover {
   background: #dcdcdc;
 }
+
+/* CONTENT AREA */
 .content {
   flex: 1;
   padding: 25px;
   background: #fff;
-  overflow-y: auto;
-}
-.module-box {
-  background: #f7faff;
-  .task {
-    margin: 5px 0;
-  }
+  border-radius: 12px;
+  min-height: 500px;
 }
 
+/* ========================= */
+/*   MODULE BOXES            */
+/* ========================= */
+.module-box {
+  background: #f7faff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #dbe6f5;
+}
+
+.task {
+  margin: 5px 0;
+}
+
+/* ========================= */
+/*   PDF PREVIEW BOX         */
+/* ========================= */
 .pdf-box {
   background: #f2f4f7;
   padding: 15px;
-  margin: 10px 0;
   border-radius: 10px;
   border: 1px solid #ddd;
+  margin-top: 15px;
 }
 
-.pdf-small-preview {
-  margin-bottom: 10px;
+.pdf-small-preview iframe {
+  width: 100%;
+  height: 200px; /* kecil dan tidak makan layar */
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 .pdf-download {
   display: inline-block;
-  padding: 8px 14px;
+  padding: 10px 16px;
   background: #4a90e2;
   color: white;
-  border-radius: 8px;
   text-decoration: none;
-  font-weight: 500;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-top: 10px;
 }
 
 .pdf-download:hover {
   background: #357ab8;
+}
+
+/* ========================= */
+/*   RESPONSIVE MOBILE       */
+/* ========================= */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 15px;
+  }
+
+  .content {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .sidebar li {
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  .pdf-small-preview iframe {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 20px;
+  }
+
+  .sidebar li {
+    font-size: 14px;
+  }
+
+  #module-title {
+    font-size: 18px;
+  }
+
+  #module-content {
+    font-size: 15px;
+  }
+
+  .pdf-small-preview iframe {
+    height: 160px;
+  }
 }
