@@ -1,5 +1,5 @@
 /* ========================= */
-/* BASE STYLE */
+/* GLOBAL */
 /* ========================= */
 body {
   margin: 0;
@@ -9,21 +9,18 @@ body {
 
 header {
   background: #2f80ed;
-  padding: 20px;
+  padding: 15px 20px;
   color: white;
   text-align: center;
 }
 
 /* ========================= */
-/* FIX UTAMA ADA DI SINI */
+/* LAYOUT */
 /* ========================= */
 .container {
   display: flex;
-  gap: 20px;
-  padding: 20px;
-  flex-wrap: wrap; /* WAJIB AGAR TURUN DI HP */
-  width: 100%;
-  box-sizing: border-box;
+  min-height: calc(100vh - 70px);
+  flex-direction: row;
 }
 
 /* ========================= */
@@ -32,11 +29,12 @@ header {
 .sidebar {
   width: 250px;
   background: white;
-  padding: 20px;
-  border-right: 2px solid #ccc;
-  border-radius: 10px;
-  height: fit-content;
-  box-sizing: border-box;
+  padding: 15px;
+  border-right: 2px solid #ddd;
+}
+
+.sidebar h2 {
+  margin-top: 0;
 }
 
 .sidebar ul {
@@ -45,12 +43,11 @@ header {
 }
 
 .sidebar li {
-  padding: 12px;
+  padding: 10px;
   background: #eee;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   cursor: pointer;
   border-radius: 6px;
-  transition: 0.2s;
 }
 
 .sidebar li:hover {
@@ -62,68 +59,84 @@ header {
 /* ========================= */
 .content {
   flex: 1;
-  padding: 25px;
-  background: #fff;
-  border-radius: 12px;
-  min-width: 0;
-  box-sizing: border-box;
+  padding: 20px;
+  background: white;
+  overflow-y: auto;
 }
 
-/* ========================= */
-/* MODULE BOX */
-/* ========================= */
 .module-box {
   background: #f7faff;
   padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  border: 1px solid #dbe6f5;
+  margin: 15px 0;
+  border-radius: 8px;
+  border: 1px solid #d8e6ff;
 }
 
-/* ========================= */
-/* PDF PREVIEW */
-/* ========================= */
+/* PDF BOX */
 .pdf-box {
   background: #f2f4f7;
   padding: 15px;
+  margin: 10px 0;
   border-radius: 10px;
   border: 1px solid #ddd;
-  margin-top: 15px;
+}
+
+.pdf-small-preview {
+  width: 100%;
+  text-align: center;
 }
 
 .pdf-small-preview iframe {
   width: 100%;
-  height: 220px;
+  height: 250px;
+  border-radius: 10px;
+}
+
+/* DOWNLOAD BUTTON */
+.pdf-download {
+  display: inline-block;
+  padding: 10px 16px;
+  background: #4a90e2;
+  color: white;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  text-decoration: none;
+  margin-top: 10px;
+}
+
+.pdf-download:hover {
+  background: #357ab8;
 }
 
 /* ========================= */
-/* RESPONSIVE FIX — HP */
+/* RESPONSIVE MODE (MOBILE) */
 /* ========================= */
-@media (max-width: 900px) {
+@media (max-width: 768px) {
+  /* Container berubah ke kolom */
+  .container {
+    flex-direction: column;
+  }
+
+  /* Sidebar kecil di HP */
   .sidebar {
-    width: 100% !important;
+    width: 100%;
     border-right: none;
-    border-bottom: 2px solid #ccc;
-  }
-
-  .content {
-    width: 100% !important;
-  }
-}
-
-/* HP KECIL */
-@media (max-width: 480px) {
-  header h1 {
-    font-size: 18px;
+    border-bottom: 2px solid #ddd;
   }
 
   .content {
     padding: 15px;
   }
 
+  header h1 {
+    font-size: 18px;
+  }
+
+  .sidebar li {
+    font-size: 14px;
+    padding: 8px;
+  }
+
   .pdf-small-preview iframe {
-    height: 160px;
+    height: 200px;
   }
 }
