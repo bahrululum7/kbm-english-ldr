@@ -1,5 +1,5 @@
 /* ========================= */
-/* GLOBAL BASE STYLE */
+/* BASE STYLE */
 /* ========================= */
 body {
   margin: 0;
@@ -9,21 +9,26 @@ body {
 
 header {
   background: #2f80ed;
-  padding: 18px;
+  padding: 20px;
   color: white;
   text-align: center;
 }
 
 /* ========================= */
-/* CONTAINER LAYOUT */
+/* FIX UTAMA ADA DI SINI */
 /* ========================= */
 .container {
   display: flex;
   gap: 20px;
   padding: 20px;
+  flex-wrap: wrap; /* WAJIB AGAR TURUN DI HP */
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* ========================= */
 /* SIDEBAR */
+/* ========================= */
 .sidebar {
   width: 250px;
   background: white;
@@ -31,6 +36,7 @@ header {
   border-right: 2px solid #ccc;
   border-radius: 10px;
   height: fit-content;
+  box-sizing: border-box;
 }
 
 .sidebar ul {
@@ -51,26 +57,27 @@ header {
   background: #dcdcdc;
 }
 
-/* CONTENT AREA */
+/* ========================= */
+/* CONTENT */
+/* ========================= */
 .content {
   flex: 1;
   padding: 25px;
   background: #fff;
   border-radius: 12px;
-  min-height: 500px;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
+/* ========================= */
 /* MODULE BOX */
+/* ========================= */
 .module-box {
   background: #f7faff;
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 10px;
   border: 1px solid #dbe6f5;
-}
-
-.task {
-  margin: 5px 0;
 }
 
 /* ========================= */
@@ -91,142 +98,32 @@ header {
   border: 1px solid #ccc;
 }
 
-.pdf-download {
-  display: inline-block;
-  padding: 10px 16px;
-  background: #4a90e2;
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-weight: 600;
-  margin-top: 10px;
-}
-
-.pdf-download:hover {
-  background: #357ab8;
-}
-
 /* ========================= */
-/* RESPONSIVE — TABLET */
+/* RESPONSIVE FIX — HP */
 /* ========================= */
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-    padding: 12px;
-  }
-
+@media (max-width: 900px) {
   .sidebar {
-    width: 100%;
+    width: 100% !important;
     border-right: none;
     border-bottom: 2px solid #ccc;
-    margin-bottom: 15px;
   }
 
   .content {
-    width: 100%;
-    padding: 18px;
-  }
-
-  .pdf-small-preview iframe {
-    height: 200px;
+    width: 100% !important;
   }
 }
 
-/* ========================= */
-/* RESPONSIVE — STANDARD PHONES */
-/* (375px – 428px) */
-/* ========================= */
+/* HP KECIL */
 @media (max-width: 480px) {
   header h1 {
-    font-size: 20px;
-  }
-
-  .sidebar li {
-    font-size: 14px;
-    padding: 10px;
+    font-size: 18px;
   }
 
   .content {
     padding: 15px;
   }
 
-  #module-title {
-    font-size: 18px;
-  }
-
-  #module-content {
-    font-size: 15px;
-  }
-
   .pdf-small-preview iframe {
-    height: 170px;
-  }
-}
-
-/* ========================= */
-/* RESPONSIVE — SMALL PHONES */
-/* (320px – 360px) */
-/* ========================= */
-@media (max-width: 360px) {
-  header {
-    padding: 14px;
-  }
-
-  header h1 {
-    font-size: 17px;
-  }
-
-  .sidebar {
-    padding: 12px;
-  }
-
-  .sidebar li {
-    font-size: 13px;
-    padding: 8px;
-    margin-bottom: 8px;
-  }
-
-  .content {
-    padding: 12px;
-  }
-
-  #module-title {
-    font-size: 16px;
-  }
-
-  #module-content {
-    font-size: 14px;
-  }
-
-  .module-box {
-    padding: 12px;
-  }
-
-  .pdf-small-preview iframe {
-    height: 150px;
-  }
-
-  .pdf-download {
-    padding: 8px 12px;
-    font-size: 14px;
-  }
-}
-
-/* ========================= */
-/* TINY PHONES FIX */
-/* (≤320px) — iPhone 5/SE lama */
-/* ========================= */
-@media (max-width: 320px) {
-  .sidebar li {
-    font-size: 12px;
-    padding: 6px;
-  }
-
-  .pdf-small-preview iframe {
-    height: 130px;
-  }
-
-  #module-title {
-    font-size: 15px;
+    height: 160px;
   }
 }
