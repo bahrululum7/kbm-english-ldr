@@ -1,21 +1,38 @@
-<h2>Login E-Learning</h2>
-<input type="email" id="email" placeholder="Email" />
-<input type="password" id="password" placeholder="Password" />
-<button onclick="login()">Login</button>
+<h2>Materi Hari Ini</h2>
+<p>Selamat belajar!</p>
 
-<script>
-  function login() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+<h3>Kuis</h3>
+<input type="number" id="nilai" placeholder="Masukkan nilai" />
+<button onclick="simpanNilai()">Simpan Nilai</button>
 
-    auth
-      .signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        alert('Login berhasil!');
-        window.location.href = 'materi.html'; // Halaman materi
+<script type="module">
+  import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+  import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+
+  const auth = window.auth;
+  const db = window.db;
+
+  function simpanNilai() {
+    const nilai = document.getElementById('nilai').value;
+    const user = auth.currentUser;
+
+    if (user) {
+      setDoc(doc(db, 'nilai', user.uid), {
+        email: user.email,
+        nilai: parseInt(nilai),
       })
-      .catch((error) => {
-        alert(error.message);
-      });
+        .then(() => alert('Nilai tersimpan!'))
+        .catch((err) => alert(err.message));
+    } else {
+      alert('Silakan login dulu!');
+    }
+  }
+
+  function logout() {
+    signOut(auth).then(() => {
+      window.location.href = 'login.html';
+    });
   }
 </script>
+
+<button onclick="logout()">Logout</button>
