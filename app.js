@@ -5,6 +5,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebas
 import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
 
 import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyARsav9m6Xv9H-XPPKnX8DNFwhZesRxQqE',
@@ -306,15 +307,31 @@ async function checkAnswers() {
   sudahMengerjakan = true;
   kunciSoal();
 
-  const wrongText = wrongList.length ? `<br><b>Soal salah:</b> ${wrongList.join(', ')}` : '';
+  const wrongText = wrongList.length ? `<br><b>Soal yang salah:</b> ${wrongList.join(', ')}` : '';
+  document.getElementById('result').innerHTML = `<b>Nilai Kamu:</b> ${score} / 10 ${wrongText}`;
 
-  document.getElementById('result').innerHTML = `
-    <b>Nilai Kamu:</b> ${score} / 10 ${wrongText}
-    <br><span style="color:green;font-weight:bold;">✔ Jawaban disimpan • Kamu tidak bisa mengerjakan lagi</span>
-  `;
+  // SIMPAN NILAI KE FIRESTORE
+  saveScoreToFirestore(score);
+}
+
+async function saveScoreToFirestore(score) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  try {
+    await setDoc(doc(db, 'scores', user.uid), {
+      email: user.email,
+      score: score,
+      timestamp: new Date(),
+    });
+    console.log('Nilai berhasil disimpan!');
+  } catch (error) {
+    console.error('Gagal menyimpan nilai:', error);
+  }
 }
 
 // ----------------------
 window.loadModule = loadModule;
 window.checkAnswers = checkAnswers;
 window.logout = logout;
+window.saveScoreToFirestore = saveScoreToFirestore;
