@@ -22,14 +22,16 @@ let currentUser = null;
 let sudahMengerjakan = false;
 
 // ====================================================
-//  CEK LOGIN + CEK STATUS QUIZ
+//  CEK LOGIN + CEK STATUS QUIZ (pakai Email sebagai ID)
 // ====================================================
 onAuthStateChanged(auth, async (user) => {
   if (!user) return (window.location.href = 'login.html');
 
   currentUser = user;
+  const userEmail = user.email.toLowerCase().replace(/\./g, '_');
+  // firestore tidak boleh ada "." di ID
 
-  const docRef = doc(db, 'quizStatus', user.uid);
+  const docRef = doc(db, 'quizStatus', userEmail);
   const snap = await getDoc(docRef);
 
   if (snap.exists()) {
@@ -116,7 +118,6 @@ const modules = {
     <p>Pilih jawaban yang benar.</p>
 
     <ol id="listening-questions" class="space-y-3">
-
       <li>
         “This is Andi. ______ is my brother.”<br>
         A. <input type="radio" name="q1" value="He"> He<br>
@@ -248,7 +249,7 @@ function loadModule(week) {
 window.loadModule = loadModule;
 
 // ====================================================
-//  Check Answers
+//  Check Answers + SIMPAN EMAIL sebagai DOCUMENT ID
 // ====================================================
 async function checkAnswers() {
   if (sudahMengerjakan) return;
@@ -296,7 +297,11 @@ async function checkAnswers() {
     }
   }
 
-  await setDoc(doc(db, 'quizStatus', currentUser.uid), {
+  // 🔥 Pakai EMAIL sebagai document ID
+  const emailID = currentUser.email.toLowerCase().replace(/\./g, '_');
+
+  await setDoc(doc(db, 'quizStatus', emailID), {
+    email: currentUser.email,
     done: true,
     score: score,
     timestamp: Date.now(),
