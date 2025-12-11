@@ -1,9 +1,8 @@
-// ----------------------
-// Firebase Initialization
-// ----------------------
+// ====================================================
+//  Firebase Initialization
+// ====================================================
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
 import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
-
 import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -22,39 +21,38 @@ const db = getFirestore(app);
 let currentUser = null;
 let sudahMengerjakan = false;
 
-// ----------------------
-// Cek login & cek apakah sudah mengerjakan
-// ----------------------
+// ====================================================
+//  CEK LOGIN + CEK STATUS QUIZ
+// ====================================================
 onAuthStateChanged(auth, async (user) => {
   if (!user) return (window.location.href = 'login.html');
 
   currentUser = user;
 
-  // cek Firestore apakah user sudah mengerjakan
   const docRef = doc(db, 'quizStatus', user.uid);
   const snap = await getDoc(docRef);
 
   if (snap.exists()) {
     sudahMengerjakan = snap.data().done;
-
     if (sudahMengerjakan) {
       kunciSoal();
     }
   }
 });
 
-// ----------------------
-// Logout
-// ----------------------
+// ====================================================
+//  Logout
+// ====================================================
 function logout() {
   signOut(auth)
     .then(() => (window.location.href = 'login.html'))
-    .catch((error) => alert('Logout gagal: ' + error.message));
+    .catch((err) => alert('Logout gagal: ' + err.message));
 }
+window.logout = logout;
 
-// ------------------------------------------------------
-// Fungsi Mengunci Soal (tidak bisa dikerjakan lagi)
-// ------------------------------------------------------
+// ====================================================
+//  Fungsi Mengunci Soal
+// ====================================================
 function kunciSoal() {
   const area = document.getElementById('listening-questions');
   if (area) {
@@ -75,10 +73,11 @@ function kunciSoal() {
     result.innerHTML = '<b>Kamu sudah mengerjakan latihan ini. Tidak bisa ulang.</b>';
   }
 }
+window.kunciSoal = kunciSoal;
 
-// ----------------------
-// Modules
-// ----------------------
+// ====================================================
+//  Data Modules
+// ====================================================
 const modules = {
   week1: {
     title: 'Week 1 – Basic Survival English',
@@ -219,35 +218,38 @@ const modules = {
     <p id="result" class="mt-2 text-center font-semibold"></p>
   </div>
 </div>
-`,
+    `,
   },
 };
 
+// ====================================================
+//  Toggle Content
+// ====================================================
 function toggleContent(id) {
-  const c = document.getElementById(id);
+  const content = document.getElementById(id);
   const icon = document.getElementById('icon-' + id);
 
-  c.classList.toggle('hidden');
-  icon.innerText = c.classList.contains('hidden') ? '▼' : '▲';
+  content.classList.toggle('hidden');
+  icon.innerText = content.classList.contains('hidden') ? '▼' : '▲';
 }
 window.toggleContent = toggleContent;
 
-// ----------------------
-// Load Module
-// ----------------------
+// ====================================================
+//  Load Module
+// ====================================================
 function loadModule(week) {
   document.getElementById('module-title').innerHTML = modules[week].title;
   document.getElementById('module-content').innerHTML = modules[week].content;
 
-  // jika user sudah mengerjakan, kunci langsung
   if (sudahMengerjakan) {
     setTimeout(() => kunciSoal(), 300);
   }
 }
+window.loadModule = loadModule;
 
-// ----------------------
-// Check Answers
-// ----------------------
+// ====================================================
+//  Check Answers
+// ====================================================
 async function checkAnswers() {
   if (sudahMengerjakan) return;
 
@@ -274,10 +276,10 @@ async function checkAnswers() {
 
   for (let q in correct) {
     const selected = document.querySelector(`input[name="${q}"]:checked`);
-    const li = document.querySelector(`input[name="${q}"]`)?.closest('li');
+    const li = document.querySelector(`input[name="${q}"]`).closest('li');
     const number = q.replace('q', '');
 
-    if (selected && li) {
+    if (selected) {
       if (selected.value === correct[q]) {
         score++;
         li.style.background = '#d4ffd4';
@@ -287,16 +289,13 @@ async function checkAnswers() {
         li.style.background = '#ffd4d4';
         li.style.border = '1px solid #d43c3c';
       }
-    } else if (li) {
+    } else {
       wrongList.push(number);
       li.style.background = '#ffd4d4';
       li.style.border = '1px solid #d43c3c';
     }
   }
 
-  // --------------------------
-  // SIMPAN KE FIRESTORE
-  // --------------------------
   await setDoc(doc(db, 'quizStatus', currentUser.uid), {
     done: true,
     score: score,
@@ -306,31 +305,11 @@ async function checkAnswers() {
   sudahMengerjakan = true;
   kunciSoal();
 
-  const wrongText = wrongList.length ? `<br><b>Soal yang salah:</b> ${wrongList.join(', ')}` : '';
-  document.getElementById('result').innerHTML = `<b>Nilai Kamu:</b> ${score} / 10 ${wrongText}`;
+  const wrongText = wrongList.length ? `<br><b>Soal salah:</b> ${wrongList.join(', ')}` : '';
 
-  // SIMPAN NILAI KE FIRESTORE
-  saveScoreToFirestore(score);
+  document.getElementById('result').innerHTML = `
+    <b>Nilai Kamu:</b> ${score} / 10 ${wrongText}
+    <br><span style="color:green;font-weight:bold;">✔ Jawaban disimpan • Kamu tidak bisa mengerjakan lagi</span>
+  `;
 }
-
-async function saveScoreToFirestore(score) {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  try {
-    await setDoc(doc(db, 'scores', user.uid), {
-      email: user.email,
-      score: score,
-      timestamp: new Date(),
-    });
-    console.log('Nilai berhasil disimpan!');
-  } catch (error) {
-    console.error('Gagal menyimpan nilai:', error);
-  }
-}
-
-// ----------------------
-window.loadModule = loadModule;
 window.checkAnswers = checkAnswers;
-window.logout = logout;
-window.saveScoreToFirestore = saveScoreToFirestore;
