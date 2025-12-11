@@ -1,21 +1,54 @@
-<h2>Login E-Learning</h2>
-<input type="email" id="email" placeholder="Email" />
-<input type="password" id="password" placeholder="Password" />
-<button onclick="login()">Login</button>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - KBM English LDR</title>
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-blue-50 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+      <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">📚 KBM English LDR</h1>
+      <h2 class="text-xl text-center mb-6 text-gray-700">Login E-Learning</h2>
 
-<script>
-  function login() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+      <div class="space-y-4">
+        <input type="email" id="email" placeholder="Email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
 
-    auth
-      .signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        alert('Login berhasil!');
-        window.location.href = 'materi.html'; // Halaman materi
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
-  }
-</script>
+        <input type="password" id="password" placeholder="Password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+        <button onclick="login()" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">Login</button>
+      </div>
+
+      <p class="text-center text-gray-500 mt-4">
+        Belum punya akun?
+        <a href="register.html" class="text-blue-600 hover:underline">Daftar di sini</a>
+      </p>
+    </div>
+
+    <script type="module">
+      import { signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+
+      const auth = window.auth; // harus sudah diinisialisasi di firebase init
+
+      function login() {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!email || !password) {
+          alert('Silakan isi semua field!');
+          return;
+        }
+
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            alert('Login berhasil!');
+            window.location.href = 'materi.html'; // arah ke materi
+          })
+          .catch((error) => {
+            alert('Login gagal: ' + error.message);
+          });
+      }
+    </script>
+  </body>
+</html>
