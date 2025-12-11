@@ -14,11 +14,8 @@
 
       <div class="space-y-4">
         <input type="email" id="email" placeholder="Email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
-
         <input type="password" id="password" placeholder="Password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
-
         <input type="password" id="confirmPassword" placeholder="Konfirmasi Password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
-
         <button onclick="register()" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">Register</button>
       </div>
 
@@ -29,11 +26,28 @@
     </div>
 
     <script type="module">
-      import { createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
+      import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
 
-      const auth = window.auth; // pastikan auth sudah diinisialisasi di index.html
+      // ----------------------
+      // Firebase Config & Init
+      // ----------------------
+      const firebaseConfig = {
+        apiKey: 'AIzaSyARsav9m6Xv9H-XPPKnX8DNFwhZesRxQqE',
+        authDomain: 'elearning-english.firebaseapp.com',
+        projectId: 'elearning-english',
+        storageBucket: 'elearning-english.appspot.com',
+        messagingSenderId: '307108036106',
+        appId: '1:307108036106:web:5c8a2b0bbdc7a084f7e9f3',
+      };
 
-      function register() {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      // ----------------------
+      // Fungsi Register
+      // ----------------------
+      window.register = function () {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value.trim();
         const confirmPassword = document.getElementById('confirmPassword').value.trim();
@@ -49,14 +63,14 @@
         }
 
         createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
+          .then(() => {
             alert('Akun berhasil dibuat! Silakan login.');
             window.location.href = 'login.html';
           })
           .catch((error) => {
             alert('Gagal membuat akun: ' + error.message);
           });
-      }
+      };
     </script>
   </body>
 </html>
