@@ -1,0 +1,36 @@
+<h2>Materi Hari Ini</h2>
+<p>Selamat belajar!</p>
+
+<h3>Kuis</h3>
+<input type="number" id="nilai" placeholder="Masukkan nilai" />
+<button onclick="simpanNilai()">Simpan Nilai</button>
+
+<script>
+  function simpanNilai() {
+    const nilai = document.getElementById('nilai').value;
+    const user = auth.currentUser;
+
+    if (user) {
+      db.collection('nilai')
+        .doc(user.uid)
+        .set({
+          email: user.email,
+          nilai: parseInt(nilai),
+        })
+        .then(() => alert('Nilai tersimpan!'))
+        .catch((err) => alert(err.message));
+    } else {
+      alert('Silakan login dulu!');
+    }
+  }
+</script>
+
+<button onclick="logout()">Logout</button>
+
+<script>
+  function logout() {
+    auth.signOut().then(() => {
+      window.location.href = 'login.html';
+    });
+  }
+</script>
