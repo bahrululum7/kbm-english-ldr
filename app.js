@@ -318,3 +318,43 @@ async function checkAnswers() {
   `;
 }
 window.checkAnswers = checkAnswers;
+
+// ====================================================
+// AUTO LOGOUT KARENA TIDAK ADA AKTIVITAS (5 menit)
+// ====================================================
+
+let inactivityTime = 0;
+const MAX_INACTIVITY = 5 * 60 * 1000; // 5 menit
+
+function resetTimer() {
+  inactivityTime = 0;
+}
+
+function startInactivityChecker() {
+  // Reset kalau ada aktivitas
+  window.onload = resetTimer;
+  document.onmousemove = resetTimer;
+  document.onkeydown = resetTimer;
+  document.onclick = resetTimer;
+  document.onscroll = resetTimer;
+
+  // Cek setiap 1 detik
+  setInterval(() => {
+    inactivityTime += 1000;
+
+    if (inactivityTime >= MAX_INACTIVITY) {
+      console.log('Auto logout: user tidak aktif 5 menit');
+
+      signOut(auth).then(() => {
+        window.location.href = 'login.html';
+      });
+    }
+  }, 1000);
+}
+
+// Jalankan auto logout ketika user sudah login
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    startInactivityChecker();
+  }
+});
