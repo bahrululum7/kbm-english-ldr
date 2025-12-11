@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - KBM English LDR</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>📝 Register - E-Learning KBM English</h1>
+    </header>
+
+    <div class="container" style="flex-direction: column; padding: 20px">
+      <h2>Buat Akun Baru</h2>
+
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <input type="password" id="confirmPassword" placeholder="Konfirmasi Password" />
+      <button onclick="register()">Register</button>
+      <p>Sudah punya akun? <a href="login.html">Login di sini</a></p>
+    </div>
+
+    <script type="module">
+      import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+
+      const auth = window.auth; // Firebase auth global dari index.html
+
+      function register() {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+        if (!email || !password || !confirmPassword) {
+          alert('Semua field harus diisi!');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          alert('Password dan konfirmasi password tidak sama!');
+          return;
+        }
+
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            alert('Akun berhasil dibuat! Silakan login.');
+            window.location.href = 'login.html';
+          })
+          .catch((error) => {
+            alert('Gagal membuat akun: ' + error.message);
+          });
+      }
+    </script>
+  </body>
+</html>
