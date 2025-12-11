@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - KBM English LDR</title>
-    <!-- TailwindCSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-blue-50 flex items-center justify-center min-h-screen">
@@ -28,9 +27,6 @@
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
       import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
 
-      // ----------------------
-      // Firebase Config
-      // ----------------------
       const firebaseConfig = {
         apiKey: 'AIzaSyARsav9m6Xv9H-XPPKnX8DNFwhZesRxQqE',
         authDomain: 'elearning-english.firebaseapp.com',
@@ -43,16 +39,11 @@
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
 
-      // Jika user sudah login, langsung redirect ke materi
+      // Jika user sudah login, langsung ke index.html
       onAuthStateChanged(auth, (user) => {
-        if (user) {
-          window.location.href = 'index.html';
-        }
+        if (user) window.location.href = 'index.html';
       });
 
-      // ----------------------
-      // Fungsi Login
-      // ----------------------
       window.login = function () {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value.trim();
@@ -63,13 +54,8 @@
         }
 
         signInWithEmailAndPassword(auth, email, password)
-          .then(() => {
-            alert('Login berhasil!');
-            window.location.href = 'index.html';
-          })
-          .catch((error) => {
-            alert('Login gagal: ' + error.message);
-          });
+          .then(() => (window.location.href = 'index.html'))
+          .catch((err) => alert('Login gagal: ' + err.message));
       };
     </script>
   </body>

@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - KBM English LDR</title>
-    <!-- TailwindCSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-blue-50 flex items-center justify-center min-h-screen">
@@ -29,9 +28,6 @@
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
       import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
 
-      // ----------------------
-      // Firebase Config & Init
-      // ----------------------
       const firebaseConfig = {
         apiKey: 'AIzaSyARsav9m6Xv9H-XPPKnX8DNFwhZesRxQqE',
         authDomain: 'elearning-english.firebaseapp.com',
@@ -44,9 +40,6 @@
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
 
-      // ----------------------
-      // Fungsi Register
-      // ----------------------
       window.register = function () {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value.trim();
@@ -67,9 +60,7 @@
             alert('Akun berhasil dibuat! Silakan login.');
             window.location.href = 'login.html';
           })
-          .catch((error) => {
-            alert('Gagal membuat akun: ' + error.message);
-          });
+          .catch((err) => alert('Gagal membuat akun: ' + err.message));
       };
     </script>
   </body>

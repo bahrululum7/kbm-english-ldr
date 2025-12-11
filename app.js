@@ -1,3 +1,46 @@
+// ----------------------
+// Firebase Initialization
+// ----------------------
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
+import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyARsav9m6Xv9H-XPPKnX8DNFwhZesRxQqE',
+  authDomain: 'elearning-english.firebaseapp.com',
+  projectId: 'elearning-english',
+  storageBucket: 'elearning-english.appspot.com',
+  messagingSenderId: '307108036106',
+  appId: '1:307108036106:web:5c8a2b0bbdc7a084f7e9f3',
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ----------------------
+// Cek login, kalau belum login redirect ke login.html
+// ----------------------
+onAuthStateChanged(auth, (user) => {
+  if (!user) window.location.href = 'login.html';
+});
+
+// ----------------------
+// Logout
+// ----------------------
+function logout() {
+  signOut(auth)
+    .then(() => {
+      window.location.href = 'login.html';
+    })
+    .catch((error) => {
+      alert('Logout gagal: ' + error.message);
+    });
+}
+
+// ----------------------
+// Modules
+// ----------------------
 const modules = {
   week1: {
     title: 'Week 1 – Basic Survival English',
@@ -13,7 +56,6 @@ const modules = {
 <div class='module-box'><h3>Jadwal KBM (30 min per day)</h3>
 <p><b>Day 1:</b> Pronouns</p>
 
-<!-- 🔗 Link Meeting -->
 <p>
   <strong>Link Meeting:</strong><br>
   <a href="https://meet.google.com/gwh-auyb-wyq" target="_blank">
@@ -130,7 +172,6 @@ const modules = {
   E. <input type="radio" name="q10" value="it"> it
 </li>
 
-
   </ol>
 
   <button onclick="checkAnswers()" class="btn-check">Cek Jawaban</button>
@@ -138,28 +179,22 @@ const modules = {
 </div>
 `,
   },
-
-  week2: {
-    title: 'Week 2 – Coming Soon',
-    content: `<div class='module-box'><h3>Coming Soon</h3><p>Minggu ini masih dikunci. Fokus dulu Week 1: Speaking & Conversation Basics.</p></div>`,
-  },
-
-  week3: {
-    title: 'Week 3 – Coming Soon',
-    content: `<div class='module-box'><h3>Coming Soon</h3><p>Minggu ini akan terbuka setelah Week 2 selesai.</p></div>`,
-  },
-
-  week4: {
-    title: 'Week 4 – Coming Soon',
-    content: `<div class='module-box'><h3>Coming Soon</h3><p>Minggu terakhir akan aktif setelah semua minggu sebelumnya selesai.</p></div>`,
-  },
+  week2: { title: 'Week 2 – Coming Soon', content: `<div class='module-box'><h3>Coming Soon</h3></div>` },
+  week3: { title: 'Week 3 – Coming Soon', content: `<div class='module-box'><h3>Coming Soon</h3></div>` },
+  week4: { title: 'Week 4 – Coming Soon', content: `<div class='module-box'><h3>Coming Soon</h3></div>` },
 };
 
+// ----------------------
+// Load Module
+// ----------------------
 function loadModule(week) {
   document.getElementById('module-title').innerHTML = modules[week].title;
   document.getElementById('module-content').innerHTML = modules[week].content;
 }
 
+// ----------------------
+// Check Answers
+// ----------------------
 function checkAnswers() {
   const correct = {
     q1: 'He',
@@ -177,7 +212,6 @@ function checkAnswers() {
   let score = 0;
   let wrongList = [];
 
-  // reset warna setiap pengecekan
   document.querySelectorAll('#listening-questions li').forEach((li) => {
     li.style.background = 'transparent';
     li.style.border = 'none';
@@ -186,30 +220,33 @@ function checkAnswers() {
   });
 
   for (let q in correct) {
-    const li = document.querySelector(`input[name="${q}"]`).closest('li');
     const selected = document.querySelector(`input[name="${q}"]:checked`);
+    const li = document.querySelector(`input[name="${q}"]`)?.closest('li');
 
-    if (selected) {
+    if (selected && li) {
       if (selected.value === correct[q]) {
         score++;
-        li.style.background = '#d4ffd4'; // hijau muda
+        li.style.background = '#d4ffd4';
         li.style.border = '1px solid #3cb43c';
       } else {
         wrongList.push(q);
-        li.style.background = '#ffd4d4'; // merah muda
+        li.style.background = '#ffd4d4';
         li.style.border = '1px solid #d43c3c';
       }
-    } else {
+    } else if (li) {
       wrongList.push(q);
-      li.style.background = '#ffd4d4'; // merah karena kosong
+      li.style.background = '#ffd4d4';
       li.style.border = '1px solid #d43c3c';
     }
   }
 
-  let wrongText = '';
-  if (wrongList.length > 0) {
-    wrongText = '<br><b>Soal yang salah:</b> ' + wrongList.join(', ');
-  }
-
+  const wrongText = wrongList.length ? `<br><b>Soal yang salah:</b> ${wrongList.join(', ')}` : '';
   document.getElementById('result').innerHTML = `<b>Nilai Kamu:</b> ${score} / 10 ${wrongText}`;
 }
+
+// ----------------------
+// Expose ke global supaya HTML bisa panggil
+// ----------------------
+window.loadModule = loadModule;
+window.checkAnswers = checkAnswers;
+window.logout = logout;

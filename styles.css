@@ -1,98 +1,16 @@
 /* ========================= */
-/* GLOBAL */
+/* Minor tweaks responsive   */
 /* ========================= */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-}
 
-header {
-  background: #2f80ed;
-  padding: 15px 20px;
-  color: white;
-  text-align: center;
-}
-
-/* ========================= */
-/* LAYOUT */
-/* ========================= */
-.container {
-  display: flex;
-  min-height: calc(100vh - 70px);
-  flex-direction: row;
-}
-
-/* ========================= */
-/* SIDEBAR */
-/* ========================= */
-.sidebar {
-  width: 250px;
-  background: white;
-  padding: 15px;
-  border-right: 2px solid #ddd;
-}
-
-.sidebar h2 {
-  margin-top: 0;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar li {
-  padding: 10px;
-  background: #eee;
-  margin-bottom: 8px;
-  cursor: pointer;
-  border-radius: 6px;
-}
-
-.sidebar li:hover {
-  background: #dcdcdc;
-}
-
-/* ========================= */
-/* CONTENT */
-/* ========================= */
-.content {
-  flex: 1;
-  padding: 20px;
-  background: white;
-  overflow-y: auto;
-}
-
-.module-box {
-  background: #f7faff;
-  padding: 15px;
-  margin: 15px 0;
-  border-radius: 8px;
-  border: 1px solid #d8e6ff;
-}
-
-/* PDF BOX */
-.pdf-box {
-  background: #f2f4f7;
-  padding: 15px;
-  margin: 10px 0;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-}
-
-.pdf-small-preview {
-  width: 100%;
-  text-align: center;
-}
-
+/* PDF Box preview */
 .pdf-small-preview iframe {
   width: 100%;
   height: 250px;
   border-radius: 10px;
+  border: 1px solid #ccc;
 }
 
-/* DOWNLOAD BUTTON */
+/* Download button */
 .pdf-download {
   display: inline-block;
   padding: 10px 16px;
@@ -101,42 +19,83 @@ header {
   border-radius: 8px;
   text-decoration: none;
   margin-top: 10px;
+  transition: background 0.3s;
 }
 
 .pdf-download:hover {
   background: #357ab8;
 }
 
+/* Module box */
+.module-box {
+  background: #f7faff;
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: 8px;
+  border: 1px solid #d8e6ff;
+}
+
 /* ========================= */
-/* RESPONSIVE MODE (MOBILE) */
+/* Media Queries             */
 /* ========================= */
+
+/* Small devices (HP <480px) */
+@media (max-width: 480px) {
+  header {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .pdf-small-preview iframe {
+    height: 150px;
+  }
+
+  .sidebar li {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .module-box {
+    padding: 10px;
+  }
+
+  main {
+    padding: 12px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+
+/* Medium devices (tablet 481px - 768px) */
 @media (max-width: 768px) {
-  /* Container berubah ke kolom */
-  .container {
-    flex-direction: column;
+  .pdf-small-preview iframe {
+    height: 200px;
   }
 
-  /* Sidebar kecil di HP */
-  .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 2px solid #ddd;
+  .module-box {
+    padding: 12px;
   }
 
-  .content {
+  main {
     padding: 15px;
-  }
-
-  header h1 {
-    font-size: 18px;
   }
 
   .sidebar li {
     font-size: 14px;
     padding: 8px;
   }
+}
 
+/* Large devices (desktop 769px - 1200px) */
+@media (min-width: 769px) and (max-width: 1200px) {
   .pdf-small-preview iframe {
-    height: 200px;
+    height: 220px;
+  }
+
+  .module-box {
+    padding: 15px;
   }
 }
