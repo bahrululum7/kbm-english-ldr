@@ -18,11 +18,17 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// ====================================================
+//  GLOBAL STATE
+// ====================================================
 let currentUser = null;
-let sudahMengerjakan = false;
+let quizStatus = {
+  meeting1: false,
+  meeting2: false,
+};
 
 // ====================================================
-//  AUTH CHECK (SATU KALI SAJA)
+//  AUTH CHECK (SATU KALI)
 // ====================================================
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -33,15 +39,15 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user;
 
   const emailID = user.email.toLowerCase().replace(/\./g, '_');
-  const docRef = doc(db, 'quizStatus', emailID);
-  const snap = await getDoc(docRef);
+  const snap = await getDoc(doc(db, 'quizStatus', emailID));
 
   if (snap.exists()) {
-    sudahMengerjakan = snap.data().done === true;
+    const data = snap.data();
+    quizStatus.meeting1 = data.meeting1?.done || false;
+    quizStatus.meeting2 = data.meeting2?.done || false;
   }
 
   loadModule('week1');
-
   startInactivityChecker();
 });
 
@@ -49,14 +55,14 @@ onAuthStateChanged(auth, async (user) => {
 //  Logout
 // ====================================================
 function logout() {
-  signOut(auth)
-    .then(() => (window.location.href = 'login.html'))
-    .catch((err) => alert('Logout gagal: ' + err.message));
+  signOut(auth).then(() => {
+    window.location.href = 'login.html';
+  });
 }
 window.logout = logout;
 
 // ====================================================
-//  Data Modules
+//  MODULE DATA
 // ====================================================
 const modules = {
   week1: {
@@ -154,7 +160,6 @@ const modules = {
 </div>
         `,
       },
-
       meeting2: {
         title: 'Meeting 2: Simple Past Tense',
         content: `
@@ -241,18 +246,17 @@ const modules = {
 </div>
   `,
       },
-
       meeting3: {
         title: 'Meeting 3: Daily Vocabulary',
         content: `
-<div class="module-box">
-  <h3>Materi</h3>
-  <ul>
-    <li>Daily Activities</li>
-    <li>Common Verbs</li>
-    <li>Speaking Practice</li>
-  </ul>
-</div>
+          <div class="module-box">
+            <h3>Materi</h3>
+            <ul>
+              <li>Daily Activities</li>
+              <li>Common Verbs</li>
+              <li>Speaking Practice</li>
+            </ul>
+          </div>
         `,
       },
     },
@@ -260,20 +264,18 @@ const modules = {
 };
 
 // ====================================================
-//  Render Module
+//  RENDER MODULE
 // ====================================================
 function loadModule(weekKey) {
   const week = modules[weekKey];
   document.getElementById('module-title').innerText = week.title;
 
   let html = '';
-
   for (const key in week.meetings) {
     const m = week.meetings[key];
-
     html += `
       <div class="module-box">
-        <button onclick="toggleMeeting('${key}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded flex justify-between">
+        <button onclick="toggleMeeting('${key}')" class="w-full bg-blue-600 text-white py-3 px-4 rounded flex justify-between">
           📘 ${m.title}
           <span id="icon-${key}">▼</span>
         </button>
@@ -287,7 +289,7 @@ function loadModule(weekKey) {
 window.loadModule = loadModule;
 
 // ====================================================
-//  Toggle
+//  TOGGLE
 // ====================================================
 function toggleMeeting(id) {
   const el = document.getElementById(id);
@@ -304,18 +306,23 @@ function toggleContent(id) {
   el.classList.toggle('hidden');
   icon.innerText = el.classList.contains('hidden') ? '▼' : '▲';
 
-  // 🔥 KUNCI QUIZ SETELAH DIBUKA
-  if (id === 'quiz1' && !el.classList.contains('hidden') && sudahMengerjakan) {
-    setTimeout(kunciSoal, 100);
+  // 🔒 LOCK QUIZ MEETING 1
+  if (id === 'quiz1' && quizStatus.meeting1) {
+    setTimeout(lockMeeting1, 100);
+  }
+
+  // 🔒 LOCK QUIZ MEETING 2
+  if (id === 'quiz2' && quizStatus.meeting2) {
+    setTimeout(lockMeeting2, 100);
   }
 }
 window.toggleContent = toggleContent;
 
 // ====================================================
-//  Quiz Logic m1
+//  QUIZ MEETING 1 (FIX TOTAL)
 // ====================================================
 async function checkAnswers() {
-  if (sudahMengerjakan) return;
+  if (quizStatus.meeting1) return;
 
   const correct = {
     q1: 'He',
@@ -331,42 +338,6 @@ async function checkAnswers() {
   };
 
   let score = 0;
-
-  for (const q in correct) {
-    const selected = document.querySelector(`input[name="${q}"]:checked`);
-    if (selected && selected.value === correct[q]) score++;
-  }
-
-  const emailID = currentUser.email.toLowerCase().replace(/\./g, '_');
-  await setDoc(doc(db, 'quizStatus', emailID), {
-    email: currentUser.email,
-    done: true,
-    score,
-    timestamp: Date.now(),
-  });
-
-  sudahMengerjakan = true;
-  kunciSoal();
-
-  document.getElementById('result').innerHTML = `<b>Nilai Kamu:</b> ${score}/10<br><span style="color:green">✔ Disimpan</span>`;
-}
-window.checkAnswers = checkAnswers;
-
-// ====================================================
-//  Quiz Logic m2
-// ====================================================
-
-async function checkAnswersMeeting2() {
-  const correct = {
-    q11: 'went',
-    q12: 'watched',
-    q13: 'ate',
-    q14: 'studied',
-    q15: 'played',
-  };
-
-  let score = 0;
-
   for (const q in correct) {
     const selected = document.querySelector(`input[name="${q}"]:checked`);
     if (selected && selected.value === correct[q]) score++;
@@ -378,44 +349,92 @@ async function checkAnswersMeeting2() {
     doc(db, 'quizStatus', emailID),
     {
       email: currentUser.email,
-      meeting2: {
-        done: true,
-        score,
-      },
+      meeting1: { done: true, score },
       timestamp: Date.now(),
     },
     { merge: true }
   );
 
-  document.getElementById('result2').innerHTML = `<b>Nilai Kamu:</b> ${score}/5<br><span style="color:green">✔ Disimpan</span>`;
+  quizStatus.meeting1 = true;
+  lockMeeting1();
+
+  document.getElementById('result').innerHTML = `<b>Nilai Kamu:</b> ${score}/10<br><span style="color:green">✔ Disimpan</span>`;
 }
-
-window.checkAnswersMeeting2 = checkAnswersMeeting2;
+window.checkAnswers = checkAnswers;
 
 // ====================================================
-//  Lock Quiz
+//  LOCK MEETING 1
 // ====================================================
-function kunciSoal() {
+function lockMeeting1() {
   const area = document.getElementById('listening-questions');
   if (!area) return;
 
   area.style.opacity = '0.5';
   area.style.pointerEvents = 'none';
+  area.querySelectorAll('input').forEach((i) => (i.disabled = true));
 
-  // 🔒 Disable semua radio
-  area.querySelectorAll('input[type="radio"]').forEach((r) => {
-    r.disabled = true;
-  });
-
-  const result = document.getElementById('result');
-  if (result) {
-    result.innerHTML = '<b>Latihan ini sudah dikerjakan. Tidak bisa diulang.</b>';
-  }
+  document.getElementById('result').innerHTML = '<b>Latihan ini sudah dikerjakan. Tidak bisa diulang.</b>';
 }
-window.kunciSoal = kunciSoal;
 
 // ====================================================
-//  AUTO LOGOUT (5 menit)
+//  QUIZ MEETING 2 (FIX TOTAL)
+// ====================================================
+async function checkAnswersMeeting2() {
+  if (quizStatus.meeting2) return;
+
+  const correct = {
+    q11: 'went',
+    q12: 'watched',
+    q13: 'ate',
+    q14: 'studied',
+    q15: 'played',
+  };
+
+  let score = 0;
+
+  for (const q in correct) {
+    const options = document.querySelectorAll(`input[name="${q}"]`);
+    options.forEach((opt) => {
+      if (opt.value === correct[q]) opt.parentElement.style.color = 'green';
+      if (opt.checked && opt.value !== correct[q]) opt.parentElement.style.color = 'red';
+      opt.disabled = true;
+    });
+
+    const selected = document.querySelector(`input[name="${q}"]:checked`);
+    if (selected && selected.value === correct[q]) score++;
+  }
+
+  const emailID = currentUser.email.toLowerCase().replace(/\./g, '_');
+
+  await setDoc(
+    doc(db, 'quizStatus', emailID),
+    {
+      email: currentUser.email,
+      meeting2: { done: true, score },
+      timestamp: Date.now(),
+    },
+    { merge: true }
+  );
+
+  quizStatus.meeting2 = true;
+
+  document.getElementById('result2').innerHTML = `<b>Nilai Kamu:</b> ${score}/5<br><span style="color:green">✔ Disimpan & terkunci</span>`;
+}
+window.checkAnswersMeeting2 = checkAnswersMeeting2;
+
+// ====================================================
+//  LOCK MEETING 2
+// ====================================================
+function lockMeeting2() {
+  const quiz = document.getElementById('quiz2');
+  if (!quiz) return;
+
+  quiz.querySelectorAll('input').forEach((i) => (i.disabled = true));
+  document.getElementById('result2').innerHTML = '<b>Latihan ini sudah dikerjakan. Tidak bisa diulang.</b>';
+}
+
+// ====================================================
+//  AUTO LOGOUT (5 MENIT)
 // ====================================================
 let inactivity = 0;
 const MAX = 5 * 60 * 1000;
