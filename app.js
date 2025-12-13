@@ -175,7 +175,7 @@ const modules = {
 
 <!-- ================= GOOGLE MEET ================= -->
 <div class="module-box">
-  <a href="https://meet.google.com/gwh-auyb-wyq" target="_blank"
+  <a href="https://meet.google.com/dwe-hqmx-wdo" target="_blank"
      class="block text-center w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
     🎥 Join Google Meet – Meeting 2
   </a>
