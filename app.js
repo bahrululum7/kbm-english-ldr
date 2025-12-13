@@ -22,24 +22,27 @@ let currentUser = null;
 let sudahMengerjakan = false;
 
 // ====================================================
-//  CEK LOGIN + CEK STATUS QUIZ (pakai Email sebagai ID)
+//  AUTH CHECK (SATU KALI SAJA)
 // ====================================================
 onAuthStateChanged(auth, async (user) => {
-  if (!user) return (window.location.href = 'login.html');
+  if (!user) {
+    window.location.href = 'login.html';
+    return;
+  }
 
   currentUser = user;
-  const userEmail = user.email.toLowerCase().replace(/\./g, '_');
-  // firestore tidak boleh ada "." di ID
 
-  const docRef = doc(db, 'quizStatus', userEmail);
+  const emailID = user.email.toLowerCase().replace(/\./g, '_');
+  const docRef = doc(db, 'quizStatus', emailID);
   const snap = await getDoc(docRef);
 
   if (snap.exists()) {
-    sudahMengerjakan = snap.data().done;
-    if (sudahMengerjakan) {
-      kunciSoal();
-    }
+    sudahMengerjakan = snap.data().done === true;
   }
+
+  loadModule('week1');
+
+  startInactivityChecker();
 });
 
 // ====================================================
@@ -53,203 +56,263 @@ function logout() {
 window.logout = logout;
 
 // ====================================================
-//  Fungsi Mengunci Soal
-// ====================================================
-function kunciSoal() {
-  const area = document.getElementById('listening-questions');
-  if (area) {
-    area.style.opacity = '0.5';
-    area.style.pointerEvents = 'none';
-  }
-
-  const btn = document.querySelector("button[onclick='checkAnswers()']");
-  if (btn) {
-    btn.disabled = true;
-    btn.innerText = 'Sudah Dikerjakan';
-    btn.classList.remove('bg-blue-500');
-    btn.classList.add('bg-gray-400');
-  }
-
-  const result = document.getElementById('result');
-  if (result) {
-    result.innerHTML = '<b>Kamu sudah mengerjakan latihan ini. Tidak bisa ulang.</b>';
-  }
-}
-window.kunciSoal = kunciSoal;
-
-// ====================================================
 //  Data Modules
 // ====================================================
 const modules = {
   week1: {
     title: 'Week 1 – Basic Survival English',
-    content: `
-<div class='module-box'>
+    meetings: {
+      meeting1: {
+        title: 'Meeting 1: Pronouns & Simple Present',
+        content: `
+<div class="module-box">
   <h3>Materi</h3>
   <ul>
-    <li>Pronouns (I, You, He/She...)</li>
-    <li>Simple Present</li>
-    <li>Past Tense</li>
-    <li>Daily Vocabulary</li>
+    <li>Pronouns (I, You, He, She, They)</li>
+    <li>Simple Present Tense</li>
   </ul>
 </div>
 
 <div class="module-box">
-  <button onclick="toggleContent('pdf1')" 
-          class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-all flex justify-between items-center">
+  <button onclick="toggleContent('pdf1')" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg flex justify-between">
     📄 Modul Day 1 (PDF)
     <span id="icon-pdf1">▼</span>
   </button>
-  <div id="pdf1" class="hidden mt-2 p-3 border rounded-lg bg-green-50 text-center">
-    <a href="Pronouns.pdf" download class="text-green-700 hover:underline font-semibold inline-block">
-      ⬇ Download Pronouns.pdf
-    </a>
+
+  <div id="pdf1" class="hidden mt-2 p-3 border rounded bg-green-50 text-center">
+    <a href="Pronouns.pdf" download class="text-green-700 font-semibold">⬇ Download Pronouns.pdf</a>
   </div>
 </div>
 
 <div class="module-box">
-  <button onclick="toggleContent('soal1')" 
-          class="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition-all flex justify-between items-center">
-    🎧 Latihan Listening – Subject & Object Pronouns (10 Soal)
-    <span id="icon-soal1">▼</span>
+  <button onclick="toggleContent('quiz1')" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg flex justify-between">
+    🎧 Latihan Listening – Pronouns
+    <span id="icon-quiz1">▼</span>
   </button>
 
-  <div id="soal1" class="hidden mt-2 p-3 border rounded-lg bg-purple-50">
-    <p>Pilih jawaban yang benar.</p>
-
+  <div id="quiz1" class="hidden mt-2 p-3 border rounded bg-purple-50">
     <ol id="listening-questions" class="space-y-3">
-      <li>
-        “This is Andi. ______ is my brother.”<br>
-        A. <input type="radio" name="q1" value="He"> He<br>
-        B. <input type="radio" name="q1" value="Him"> Him<br>
-        C. <input type="radio" name="q1" value="She"> She<br>
-        D. <input type="radio" name="q1" value="Her"> Her<br>
-        E. <input type="radio" name="q1" value="They"> They
+      <li>“This is Andi. ____ is my brother.”<br>
+        <input type="radio" name="q1" value="He"> He
+        <input type="radio" name="q1" value="Him"> Him
       </li>
 
-      <li>
-        “My mother helps ______ with homework.”<br>
-        A. <input type="radio" name="q2" value="he"> he<br>
-        B. <input type="radio" name="q2" value="they"> they<br>
-        C. <input type="radio" name="q2" value="me"> me<br>
-        D. <input type="radio" name="q2" value="she"> she<br>
-        E. <input type="radio" name="q2" value="we"> we
+      <li>“My mother helps ____.”<br>
+        <input type="radio" name="q2" value="me"> me
+        <input type="radio" name="q2" value="she"> she
       </li>
 
-      <li>
-        “This is Sinta. ______ is my classmate.”<br>
-        A. <input type="radio" name="q3" value="She"> She<br>
-        B. <input type="radio" name="q3" value="Her"> Her<br>
-        C. <input type="radio" name="q3" value="Him"> Him<br>
-        D. <input type="radio" name="q3" value="They"> They<br>
-        E. <input type="radio" name="q3" value="It"> It
+      <li>“This is Sinta. ____ is my friend.”<br>
+        <input type="radio" name="q3" value="She"> She
+        <input type="radio" name="q3" value="Her"> Her
       </li>
 
-      <li>
-        “I call Rudi every evening. I call ______ every day.”<br>
-        A. <input type="radio" name="q4" value="he"> he<br>
-        B. <input type="radio" name="q4" value="him"> him<br>
-        C. <input type="radio" name="q4" value="her"> her<br>
-        D. <input type="radio" name="q4" value="they"> they<br>
-        E. <input type="radio" name="q4" value="them"> them
+      <li>“I call Rudi every day. I call ____.”<br>
+        <input type="radio" name="q4" value="him"> him
+        <input type="radio" name="q4" value="he"> he
       </li>
 
-      <li>
-        “The teacher gives Lala a book. The teacher gives ______ a book.”<br>
-        A. <input type="radio" name="q5" value="he"> he<br>
-        B. <input type="radio" name="q5" value="they"> they<br>
-        C. <input type="radio" name="q5" value="her"> her<br>
-        D. <input type="radio" name="q5" value="him"> him<br>
-        E. <input type="radio" name="q5" value="them"> them
+      <li>“The teacher gives Lala a book. She gives ____ a book.”<br>
+        <input type="radio" name="q5" value="her"> her
+        <input type="radio" name="q5" value="she"> she
       </li>
 
-      <li>
-        “Alya and Sinta are here. I will meet ______ later.”<br>
-        A. <input type="radio" name="q6" value="they"> they<br>
-        B. <input type="radio" name="q6" value="her"> her<br>
-        C. <input type="radio" name="q6" value="him"> him<br>
-        D. <input type="radio" name="q6" value="them"> them<br>
-        E. <input type="radio" name="q6" value="it"> it
+      <li>“Alya and Sinta are here. I meet ____.”<br>
+        <input type="radio" name="q6" value="them"> them
+        <input type="radio" name="q6" value="they"> they
       </li>
 
-      <li>
-        “Rudi and Andi are brothers. ______ live in Bandung.”<br>
-        A. <input type="radio" name="q7" value="Them"> Them<br>
-        B. <input type="radio" name="q7" value="They"> They<br>
-        C. <input type="radio" name="q7" value="He"> He<br>
-        D. <input type="radio" name="q7" value="It"> It<br>
-        E. <input type="radio" name="q7" value="She"> She
+      <li>“Rudi and Andi are brothers. ____ live here.”<br>
+        <input type="radio" name="q7" value="They"> They
+        <input type="radio" name="q7" value="Them"> Them
       </li>
 
-      <li>
-        “Please give this notebook to Budi. Please give ______ this notebook.”<br>
-        A. <input type="radio" name="q8" value="he"> he<br>
-        B. <input type="radio" name="q8" value="she"> she<br>
-        C. <input type="radio" name="q8" value="him"> him<br>
-        D. <input type="radio" name="q8" value="them"> them<br>
-        E. <input type="radio" name="q8" value="her"> her
+      <li>“Please give this book to Budi. Give ____ the book.”<br>
+        <input type="radio" name="q8" value="him"> him
+        <input type="radio" name="q8" value="he"> he
       </li>
 
-      <li>
-        “This marker belongs to the school. I like ______.”<br>
-        A. <input type="radio" name="q9" value="it"> it<br>
-        B. <input type="radio" name="q9" value="them"> them<br>
-        C. <input type="radio" name="q9" value="he"> he<br>
-        D. <input type="radio" name="q9" value="she"> she<br>
-        E. <input type="radio" name="q9" value="we"> we
+      <li>“This pen is new. I like ____.”<br>
+        <input type="radio" name="q9" value="it"> it
+        <input type="radio" name="q9" value="they"> they
       </li>
 
-      <li>
-        “Lina and Rani need help. Can you help ______?”<br>
-        A. <input type="radio" name="q10" value="her"> her<br>
-        B. <input type="radio" name="q10" value="him"> him<br>
-        C. <input type="radio" name="q10" value="us"> us<br>
-        D. <input type="radio" name="q10" value="them"> them<br>
-        E. <input type="radio" name="q10" value="it"> it
+      <li>“Lina and Rani need help. Help ____.”<br>
+        <input type="radio" name="q10" value="them"> them
+        <input type="radio" name="q10" value="her"> her
       </li>
-
     </ol>
 
     <div class="mt-4 text-center">
-      <button onclick="checkAnswers()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition">
+      <button onclick="checkAnswers()" class="bg-blue-500 text-white font-bold py-2 px-6 rounded">
         Cek Jawaban
       </button>
     </div>
 
-    <p id="result" class="mt-2 text-center font-semibold"></p>
+    <p id="result" class="mt-3 text-center font-semibold"></p>
   </div>
 </div>
-    `,
+        `,
+      },
+
+      meeting2: {
+        title: 'Meeting 2: Simple Past Tense',
+        content: `
+<div class="module-box">
+  <h3>Materi</h3>
+  <ul>
+    <li>Simple Past Tense</li>
+    <li>Regular Verbs (played, studied, worked)</li>
+    <li>Irregular Verbs (went, ate, saw)</li>
+    <li>Time Expressions (yesterday, last night, last week)</li>
+  </ul>
+</div>
+
+<!-- ================= GOOGLE MEET ================= -->
+<div class="module-box">
+  <a href="https://meet.google.com/gwh-auyb-wyq" target="_blank"
+     class="block text-center w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
+    🎥 Join Google Meet – Meeting 2
+  </a>
+</div>
+
+<!-- ================= PDF MODULE ================= -->
+<div class="module-box">
+  <button onclick="toggleContent('pdf2')" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg flex justify-between">
+    📄 Modul Day 2 – Simple Past Tense (PDF)
+    <span id="icon-pdf2">▼</span>
+  </button>
+
+  <div id="pdf2" class="hidden mt-2 p-3 border rounded bg-green-50 text-center">
+    <a href="Simple-Past-Tense.pdf" download class="text-green-700 font-semibold">
+      ⬇ Download Simple-Past-Tense.pdf
+    </a>
+  </div>
+</div>
+
+<!-- ================= QUIZ ================= -->
+<div class="module-box">
+  <button onclick="toggleContent('quiz2')" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg flex justify-between">
+    ✍️ Latihan – Simple Past Tense
+    <span id="icon-quiz2">▼</span>
+  </button>
+
+  <div id="quiz2" class="hidden mt-2 p-3 border rounded bg-purple-50">
+    <ol class="space-y-3">
+      <li>
+        “I ___ to school yesterday.”<br>
+        <input type="radio" name="q11" value="went"> went
+        <input type="radio" name="q11" value="go"> go
+      </li>
+
+      <li>
+        “She ___ a movie last night.”<br>
+        <input type="radio" name="q12" value="watched"> watched
+        <input type="radio" name="q12" value="watch"> watch
+      </li>
+
+      <li>
+        “They ___ dinner at 7 PM.”<br>
+        <input type="radio" name="q13" value="ate"> ate
+        <input type="radio" name="q13" value="eat"> eat
+      </li>
+
+      <li>
+        “We ___ English last week.”<br>
+        <input type="radio" name="q14" value="studied"> studied
+        <input type="radio" name="q14" value="study"> study
+      </li>
+
+      <li>
+        “He ___ football yesterday afternoon.”<br>
+        <input type="radio" name="q15" value="played"> played
+        <input type="radio" name="q15" value="play"> play
+      </li>
+    </ol>
+
+    <div class="mt-4 text-center">
+      <button onclick="checkAnswersMeeting2()" class="bg-blue-500 text-white font-bold py-2 px-6 rounded">
+        Cek Jawaban
+      </button>
+    </div>
+
+    <p id="result2" class="mt-3 text-center font-semibold"></p>
+  </div>
+</div>
+  `,
+      },
+
+      meeting3: {
+        title: 'Meeting 3: Daily Vocabulary',
+        content: `
+<div class="module-box">
+  <h3>Materi</h3>
+  <ul>
+    <li>Daily Activities</li>
+    <li>Common Verbs</li>
+    <li>Speaking Practice</li>
+  </ul>
+</div>
+        `,
+      },
+    },
   },
 };
 
 // ====================================================
-//  Toggle Content
+//  Render Module
 // ====================================================
-function toggleContent(id) {
-  const content = document.getElementById(id);
-  const icon = document.getElementById('icon-' + id);
+function loadModule(weekKey) {
+  const week = modules[weekKey];
+  document.getElementById('module-title').innerText = week.title;
 
-  content.classList.toggle('hidden');
-  icon.innerText = content.classList.contains('hidden') ? '▼' : '▲';
-}
-window.toggleContent = toggleContent;
+  let html = '';
 
-// ====================================================
-//  Load Module
-// ====================================================
-function loadModule(week) {
-  document.getElementById('module-title').innerHTML = modules[week].title;
-  document.getElementById('module-content').innerHTML = modules[week].content;
+  for (const key in week.meetings) {
+    const m = week.meetings[key];
 
-  if (sudahMengerjakan) {
-    setTimeout(() => kunciSoal(), 300);
+    html += `
+      <div class="module-box">
+        <button onclick="toggleMeeting('${key}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded flex justify-between">
+          📘 ${m.title}
+          <span id="icon-${key}">▼</span>
+        </button>
+        <div id="${key}" class="hidden mt-3">${m.content}</div>
+      </div>
+    `;
   }
+
+  document.getElementById('module-content').innerHTML = html;
 }
 window.loadModule = loadModule;
 
 // ====================================================
-//  Check Answers + SIMPAN EMAIL sebagai DOCUMENT ID
+//  Toggle
+// ====================================================
+function toggleMeeting(id) {
+  const el = document.getElementById(id);
+  const icon = document.getElementById('icon-' + id);
+  el.classList.toggle('hidden');
+  icon.innerText = el.classList.contains('hidden') ? '▼' : '▲';
+}
+window.toggleMeeting = toggleMeeting;
+
+function toggleContent(id) {
+  const el = document.getElementById(id);
+  const icon = document.getElementById('icon-' + id);
+
+  el.classList.toggle('hidden');
+  icon.innerText = el.classList.contains('hidden') ? '▼' : '▲';
+
+  // 🔥 KUNCI QUIZ SETELAH DIBUKA
+  if (id === 'quiz1' && !el.classList.contains('hidden') && sudahMengerjakan) {
+    setTimeout(kunciSoal, 100);
+  }
+}
+window.toggleContent = toggleContent;
+
+// ====================================================
+//  Quiz Logic m1
 // ====================================================
 async function checkAnswers() {
   if (sudahMengerjakan) return;
@@ -268,93 +331,99 @@ async function checkAnswers() {
   };
 
   let score = 0;
-  let wrongList = [];
 
-  document.querySelectorAll('#listening-questions li').forEach((li) => {
-    li.style.background = 'transparent';
-    li.style.border = 'none';
-  });
-
-  for (let q in correct) {
+  for (const q in correct) {
     const selected = document.querySelector(`input[name="${q}"]:checked`);
-    const li = document.querySelector(`input[name="${q}"]`).closest('li');
-    const number = q.replace('q', '');
-
-    if (selected) {
-      if (selected.value === correct[q]) {
-        score++;
-        li.style.background = '#d4ffd4';
-        li.style.border = '1px solid #3cb43c';
-      } else {
-        wrongList.push(number);
-        li.style.background = '#ffd4d4';
-        li.style.border = '1px solid #d43c3c';
-      }
-    } else {
-      wrongList.push(number);
-      li.style.background = '#ffd4d4';
-      li.style.border = '1px solid #d43c3c';
-    }
+    if (selected && selected.value === correct[q]) score++;
   }
 
-  // 🔥 Pakai EMAIL sebagai document ID
   const emailID = currentUser.email.toLowerCase().replace(/\./g, '_');
-
   await setDoc(doc(db, 'quizStatus', emailID), {
     email: currentUser.email,
     done: true,
-    score: score,
+    score,
     timestamp: Date.now(),
   });
 
   sudahMengerjakan = true;
   kunciSoal();
 
-  const wrongText = wrongList.length ? `<br><b>Soal salah:</b> ${wrongList.join(', ')}` : '';
-
-  document.getElementById('result').innerHTML = `
-    <b>Nilai Kamu:</b> ${score} / 10 ${wrongText}
-    <br><span style="color:green;font-weight:bold;">✔ Jawaban disimpan • Kamu tidak bisa mengerjakan lagi</span>
-  `;
+  document.getElementById('result').innerHTML = `<b>Nilai Kamu:</b> ${score}/10<br><span style="color:green">✔ Disimpan</span>`;
 }
 window.checkAnswers = checkAnswers;
 
 // ====================================================
-// AUTO LOGOUT KARENA TIDAK ADA AKTIVITAS (5 menit)
+//  Quiz Logic m2
 // ====================================================
 
-let inactivityTime = 0;
-const MAX_INACTIVITY = 5 * 60 * 1000; // 5 menit
+async function checkAnswersMeeting2() {
+  if (sudahMengerjakan) return;
 
-function resetTimer() {
-  inactivityTime = 0;
+  const correct = {
+    q11: 'went',
+    q12: 'watched',
+    q13: 'ate',
+    q14: 'studied',
+    q15: 'played',
+  };
+
+  let score = 0;
+
+  for (const q in correct) {
+    const selected = document.querySelector(`input[name="${q}"]:checked`);
+    if (selected && selected.value === correct[q]) score++;
+  }
+
+  const emailID = currentUser.email.toLowerCase().replace(/\./g, '_');
+
+  await setDoc(doc(db, 'quizStatus', emailID), {
+    email: currentUser.email,
+    done: true,
+    meeting: 'meeting2',
+    score,
+    timestamp: Date.now(),
+  });
+
+  sudahMengerjakan = true;
+
+  document.getElementById('result2').innerHTML = `<b>Nilai Kamu:</b> ${score}/5<br><span style="color:green">✔ Disimpan</span>`;
 }
+window.checkAnswersMeeting2 = checkAnswersMeeting2;
+
+// ====================================================
+//  Lock Quiz
+// ====================================================
+function kunciSoal() {
+  const area = document.getElementById('listening-questions');
+  if (!area) return;
+
+  area.style.opacity = '0.5';
+  area.style.pointerEvents = 'none';
+
+  // 🔒 Disable semua radio
+  area.querySelectorAll('input[type="radio"]').forEach((r) => {
+    r.disabled = true;
+  });
+
+  const result = document.getElementById('result');
+  if (result) {
+    result.innerHTML = '<b>Latihan ini sudah dikerjakan. Tidak bisa diulang.</b>';
+  }
+}
+window.kunciSoal = kunciSoal;
+
+// ====================================================
+//  AUTO LOGOUT (5 menit)
+// ====================================================
+let inactivity = 0;
+const MAX = 5 * 60 * 1000;
 
 function startInactivityChecker() {
-  // Reset kalau ada aktivitas
-  window.onload = resetTimer;
-  document.onmousemove = resetTimer;
-  document.onkeydown = resetTimer;
-  document.onclick = resetTimer;
-  document.onscroll = resetTimer;
+  const reset = () => (inactivity = 0);
+  document.onclick = document.onmousemove = document.onkeydown = reset;
 
-  // Cek setiap 1 detik
   setInterval(() => {
-    inactivityTime += 1000;
-
-    if (inactivityTime >= MAX_INACTIVITY) {
-      console.log('Auto logout: user tidak aktif 5 menit');
-
-      signOut(auth).then(() => {
-        window.location.href = 'login.html';
-      });
-    }
+    inactivity += 1000;
+    if (inactivity >= MAX) logout();
   }, 1000);
 }
-
-// Jalankan auto logout ketika user sudah login
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    startInactivityChecker();
-  }
-});
