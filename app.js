@@ -357,8 +357,6 @@ window.checkAnswers = checkAnswers;
 // ====================================================
 
 async function checkAnswersMeeting2() {
-  if (sudahMengerjakan) return;
-
   const correct = {
     q11: 'went',
     q12: 'watched',
@@ -376,18 +374,22 @@ async function checkAnswersMeeting2() {
 
   const emailID = currentUser.email.toLowerCase().replace(/\./g, '_');
 
-  await setDoc(doc(db, 'quizStatus', emailID), {
-    email: currentUser.email,
-    done: true,
-    meeting: 'meeting2',
-    score,
-    timestamp: Date.now(),
-  });
-
-  sudahMengerjakan = true;
+  await setDoc(
+    doc(db, 'quizStatus', emailID),
+    {
+      email: currentUser.email,
+      meeting2: {
+        done: true,
+        score,
+      },
+      timestamp: Date.now(),
+    },
+    { merge: true }
+  );
 
   document.getElementById('result2').innerHTML = `<b>Nilai Kamu:</b> ${score}/5<br><span style="color:green">✔ Disimpan</span>`;
 }
+
 window.checkAnswersMeeting2 = checkAnswersMeeting2;
 
 // ====================================================
