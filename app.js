@@ -203,37 +203,90 @@ const modules = {
   </button>
 
   <div id="quiz2" class="hidden mt-2 p-3 border rounded bg-purple-50">
-    <ol class="space-y-3">
-      <li>
-        “I ___ to school yesterday.”<br>
-        <input type="radio" name="q11" value="went"> went
-        <input type="radio" name="q11" value="go"> go
-      </li>
+    <ol class="space-y-4">
 
-      <li>
-        “She ___ a movie last night.”<br>
-        <input type="radio" name="q12" value="watched"> watched
-        <input type="radio" name="q12" value="watch"> watch
-      </li>
+  <li>
+    “___”<br>
+    <input type="radio" name="q1" value="A"> Plays football<br>
+    <input type="radio" name="q1" value="B"> Played football<br>
+    <input type="radio" name="q1" value="C"> Will play football<br>
+    <input type="radio" name="q1" value="D"> Is playing football
+  </li>
 
-      <li>
-        “They ___ dinner at 7 PM.”<br>
-        <input type="radio" name="q13" value="ate"> ate
-        <input type="radio" name="q13" value="eat"> eat
-      </li>
+  <li>
+    “___”<br>
+    <input type="radio" name="q2" value="A"> Today<br>
+    <input type="radio" name="q2" value="B"> Every night<br>
+    <input type="radio" name="q2" value="C"> Last night<br>
+    <input type="radio" name="q2" value="D"> Tomorrow
+  </li>
 
-      <li>
-        “We ___ English last week.”<br>
-        <input type="radio" name="q14" value="studied"> studied
-        <input type="radio" name="q14" value="study"> study
-      </li>
+  <li>
+    “___”<br>
+    <input type="radio" name="q3" value="A"> Jakarta<br>
+    <input type="radio" name="q3" value="B"> Bandung<br>
+    <input type="radio" name="q3" value="C"> School<br>
+    <input type="radio" name="q3" value="D"> Home
+  </li>
 
-      <li>
-        “He ___ football yesterday afternoon.”<br>
-        <input type="radio" name="q15" value="played"> played
-        <input type="radio" name="q15" value="play"> play
-      </li>
-    </ol>
+  <li>
+    “___”<br>
+    <input type="radio" name="q4" value="A"> Rice<br>
+    <input type="radio" name="q4" value="B"> Bread<br>
+    <input type="radio" name="q4" value="C"> Noodles<br>
+    <input type="radio" name="q4" value="D"> Chicken
+  </li>
+
+  <li>
+    “___”<br>
+    <input type="radio" name="q5" value="A"> work<br>
+    <input type="radio" name="q5" value="B"> works<br>
+    <input type="radio" name="q5" value="C"> worked<br>
+    <input type="radio" name="q5" value="D"> working
+  </li>
+
+  <li>
+    “___”<br>
+    <input type="radio" name="q6" value="A"> Watched a movie<br>
+    <input type="radio" name="q6" value="B"> Played a game<br>
+    <input type="radio" name="q6" value="C"> Studied English<br>
+    <input type="radio" name="q6" value="D"> Went to school
+  </li>
+
+  <li>
+    “___”<br>
+    <input type="radio" name="q7" value="A"> At school<br>
+    <input type="radio" name="q7" value="B"> At home<br>
+    <input type="radio" name="q7" value="C"> At the library<br>
+    <input type="radio" name="q7" value="D"> At campus
+  </li>
+
+  <li>
+    “___”<br>
+    <input type="radio" name="q8" value="A"> market<br>
+    <input type="radio" name="q8" value="B"> morning<br>
+    <input type="radio" name="q8" value="C"> went<br>
+    <input type="radio" name="q8" value="D"> yesterday
+  </li>
+
+  <li>
+    “___”<br>
+    <input type="radio" name="q9" value="A"> yesterday<br>
+    <input type="radio" name="q9" value="B"> tomorrow<br>
+    <input type="radio" name="q9" value="C"> last night<br>
+    <input type="radio" name="q9" value="D"> every night
+  </li>
+
+  <li>
+    “___”<br>
+    <input type="radio" name="q10" value="A"> One<br>
+    <input type="radio" name="q10" value="B"> Two<br>
+    <input type="radio" name="q10" value="C"> Three<br>
+    <input type="radio" name="q10" value="D"> Four
+  </li>
+
+</ol>
+
 
     <div class="mt-4 text-center">
       <button onclick="checkAnswersMeeting2()" class="bg-blue-500 text-white font-bold py-2 px-6 rounded">
